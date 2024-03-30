@@ -14,9 +14,10 @@
     <string name="kembali">Kembali</string>
     <string name="bagikan">Bagikan</string>
     <string name="bagikan_template">Berat badan: %1$s kg\nTinggi badan: %2$s cm\nJenis Kelamin: %3$s\nUmur: %4$s tahun</string>
-    <string name="sedikit">Sedikit</string>
+    <string name="jarang">Jarang</string>
     <string name="ringan">Ringan</string>
-    <string name="teratur">Teratur</string>
+    <string name="cukup">Cukup</string>
     <string name="tinggi">Tinggi</string>
     <string name="kaloriharian">Kalori Harian Dibutuhkan: %1$d</string>
+    <string name="activity_level">Level Aktivitas:</string>
 </resources>

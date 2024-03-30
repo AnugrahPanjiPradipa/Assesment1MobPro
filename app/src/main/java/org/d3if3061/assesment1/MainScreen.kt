@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.d3if3061.assesment1.navigation.Screen
 import org.d3if3061.assesment1.ui.theme.Assesment1Theme
-import kotlin.math.pow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,17 +115,12 @@ fun  ScreenContent(modifier: Modifier) {
     var bmr by rememberSaveable {
         mutableStateOf(0f)
     }
-    var kategori by rememberSaveable {
-        mutableStateOf(0)
-    }
     var selectedActivityLevel by rememberSaveable {
-        mutableStateOf(ActivityLevel.Sedikit)
+        mutableStateOf(ActivityLevel.Jarang)
     }
     var dailyCalories by rememberSaveable {
         mutableStateOf(0f)
     }
-    var expanded by rememberSaveable {
-        mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -193,12 +188,23 @@ fun  ScreenContent(modifier: Modifier) {
                 )
             }
         }
+        ActivityLevelSelection(selectedActivityLevel) { level ->
+            selectedActivityLevel = level
+        }
         Button(onClick = {
-            beratError = (berat =="" || berat == "0")
-            tinggiError = (tinggi =="" || tinggi == "0")
+            // Validasi input
+            beratError = (berat == "" || berat == "0")
+            tinggiError = (tinggi == "" || tinggi == "0")
             umurError = (umur == "" || umur == "00")
             if (beratError || tinggiError) return@Button
-            val bmrValue = hitungBMR(if (gender == radioOptions[0]) Gender.MALE else Gender.FEMALE, berat.toFloat(), tinggi.toFloat(), umur.toInt())
+
+            // Hitung BMR dan Kalori Harian
+            val bmrValue = hitungBMR(
+                if (gender == "Pria") Gender.MALE else Gender.FEMALE,
+                berat.toFloat(),
+                tinggi.toFloat(),
+                umur.toInt()
+            )
             if (bmrValue != 0f) {
                 bmr = bmrValue
                 dailyCalories = hitungKaloriHarian(bmrValue, selectedActivityLevel)
@@ -241,6 +247,30 @@ fun  ScreenContent(modifier: Modifier) {
         }
     }
 }
+@Composable
+fun ActivityLevelSelection(selectedLevel: ActivityLevel, onLevelSelected: (ActivityLevel) -> Unit) {
+    Column(
+        modifier = Modifier
+            .padding(top = 6.dp)
+            .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+    ) {
+        Text(
+            text = stringResource(R.string.activity_level),
+            modifier = Modifier.padding(16.dp)
+        )
+        ActivityLevel.values().forEach { level ->
+            RadioButton(
+                selected = selectedLevel == level,
+                onClick = { onLevelSelected(level) }
+            )
+            Text(
+                text = stringResource(id = level.stringResId),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun IconPicker(isError: Boolean, unit: String) {
@@ -276,7 +306,7 @@ fun GenderOption(label: String, isSelected: Boolean, modifier: Modifier) {
 private fun hitungBMR(gender: Gender, berat: Float, tinggi: Float, umur: Int): Float {
     return when (gender) {
         Gender.MALE -> 66 + (13.7f * berat) + (5 * tinggi) - (6.8f * umur)
-        Gender.FEMALE -> 665 + (9.6f * berat) + (1.8f * tinggi) - (4.7f * umur)
+        Gender.FEMALE -> 655 + (9.6f * berat) + (1.8f * tinggi) - (4.7f * umur)
     }
 }
 
@@ -294,11 +324,11 @@ private fun shareData (context: Context, message: String) {
     }
 }
 
-enum class ActivityLevel(val value: Float) {
-    Sedikit(1.4f),
-    Ringan(1.78f),
-    Teratur(1.78f),
-    Tinggi(2.1f)
+enum class ActivityLevel(val value: Float, @StringRes val stringResId: Int) {
+    Jarang(1.2f, R.string.jarang),
+    Ringan(1.375f, R.string.ringan),
+    Cukup(1.55f, R.string.cukup),
+    Tinggi(1.9f, R.string.tinggi)
 }
 
 enum class Gender {
