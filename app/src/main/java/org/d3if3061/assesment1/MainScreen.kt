@@ -5,16 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -23,8 +27,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,8 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -121,7 +124,9 @@ fun  ScreenContent(modifier: Modifier) {
     var dailyCalories by rememberSaveable {
         mutableStateOf(0f)
     }
-
+    var activityImageResource by rememberSaveable {
+        mutableStateOf(R.mipmap.rebahan)
+    }
     val context = LocalContext.current
 
     Column (
@@ -129,7 +134,7 @@ fun  ScreenContent(modifier: Modifier) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(id = R.string.bmr_intro),
@@ -171,34 +176,23 @@ fun  ScreenContent(modifier: Modifier) {
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        Row (
+        Row(
             modifier = Modifier
-                .padding(top = 6.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                .padding(top = 0.5.dp)
         ) {
-            radioOptions.forEach{ text->
-                GenderOption(label = text, isSelected = gender == text , modifier = Modifier
-                    .selectable(
-                        selected = gender == text,
-                        onClick = { gender = text },
-                        role = Role.RadioButton
-                    )
-                    .weight(1f)
-                    .padding(16.dp)
-                )
-            }
+            GenderSwitch(
+                isMaleSelected = gender == "Pria",
+                onGenderSelected = { isMale -> gender = if (isMale) "Pria" else "Wanita" }
+            )
         }
         ActivityLevelSelection(selectedActivityLevel) { level ->
             selectedActivityLevel = level
         }
         Button(onClick = {
-            // Validasi input
             beratError = (berat == "" || berat == "0")
             tinggiError = (tinggi == "" || tinggi == "0")
             umurError = (umur == "" || umur == "00")
             if (beratError || tinggiError) return@Button
-
-            // Hitung BMR dan Kalori Harian
             val bmrValue = hitungBMR(
                 if (gender == "Pria") Gender.MALE else Gender.FEMALE,
                 berat.toFloat(),
@@ -208,6 +202,12 @@ fun  ScreenContent(modifier: Modifier) {
             if (bmrValue != 0f) {
                 bmr = bmrValue
                 dailyCalories = hitungKaloriHarian(bmrValue, selectedActivityLevel)
+                activityImageResource = when (selectedActivityLevel) {
+                    ActivityLevel.Jarang -> R.mipmap.rebahan
+                    ActivityLevel.Ringan -> R.mipmap.jalan
+                    ActivityLevel.Cukup -> R.mipmap.bersepeda
+                    ActivityLevel.Tinggi -> R.mipmap.angkatbeban
+                }
             }
         },
             modifier = Modifier.padding(top = 8.dp),
@@ -229,6 +229,32 @@ fun  ScreenContent(modifier: Modifier) {
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
+            val activityImageResource = when (selectedActivityLevel) {
+                ActivityLevel.Jarang -> R.mipmap.rebahan
+                ActivityLevel.Ringan -> R.mipmap.jalan
+                ActivityLevel.Cukup -> R.mipmap.bersepeda
+                ActivityLevel.Tinggi -> R.mipmap.angkatbeban
+            }
+            Image(
+                painter = painterResource(id = activityImageResource),
+                contentDescription = null,
+                modifier = Modifier.size(200.dp)
+            )
+            ResetButton(
+                onReset = {
+                    berat = ""
+                    beratError = false
+                    tinggi = ""
+                    tinggiError = false
+                    umur = ""
+                    umurError = false
+                    gender = radioOptions[0]
+                    bmr = 0f
+                    selectedActivityLevel = ActivityLevel.Jarang
+                    dailyCalories = 0f
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            )
             Button(
                 onClick = {
                     shareData(
@@ -249,29 +275,39 @@ fun  ScreenContent(modifier: Modifier) {
 }
 @Composable
 fun ActivityLevelSelection(selectedLevel: ActivityLevel, onLevelSelected: (ActivityLevel) -> Unit) {
-    Column(
+    Row(
         modifier = Modifier
             .padding(top = 6.dp)
             .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+            .padding(horizontal = 16.dp)
     ) {
         Text(
             text = stringResource(R.string.activity_level),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
-        ActivityLevel.values().forEach { level ->
-            RadioButton(
-                selected = selectedLevel == level,
-                onClick = { onLevelSelected(level) }
-            )
-            Text(
-                text = stringResource(id = level.stringResId),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            ActivityLevel.values().forEach { level ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clickable { onLevelSelected(level) }
+                        .padding(vertical = 8.dp)
+                ) {
+                    RadioButton(
+                        selected = selectedLevel == level,
+                        onClick = null
+                    )
+                    Text(
+                        text = stringResource(id = level.stringResId),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    }
+                }
+            }
         }
     }
-}
-
 @Composable
 fun IconPicker(isError: Boolean, unit: String) {
     if (isError) {
@@ -289,19 +325,36 @@ fun ErrorHint(isError: Boolean) {
 }
 
 @Composable
-fun GenderOption(label: String, isSelected: Boolean, modifier: Modifier) {
+fun GenderSwitch(isMaleSelected: Boolean, onGenderSelected: (Boolean) -> Unit) {
     Row(
-        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RadioButton(selected = isSelected, onClick = null)
         Text(
-            text = label,
+            text = if (isMaleSelected) "Pria" else "Wanita",
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        Switch(
+            checked = isMaleSelected,
+            onCheckedChange = { onGenderSelected(it) }
         )
     }
 }
+
+@Composable
+fun ResetButton(
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onReset,
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+    ) {
+        Text(text = stringResource(R.string.reset))
+    }
+}
+
 
 private fun hitungBMR(gender: Gender, berat: Float, tinggi: Float, umur: Int): Float {
     return when (gender) {
@@ -334,11 +387,6 @@ enum class ActivityLevel(val value: Float, @StringRes val stringResId: Int) {
 enum class Gender {
     MALE,
     FEMALE
-}
-
-@Composable
-fun Greeting(name: String) {
-    MainScreen(rememberNavController())
 }
 
 @Preview(showBackground = true)
