@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.text.style.BackgroundColorSpan
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -26,6 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,8 +38,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -66,18 +74,32 @@ fun MainScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = stringResource(id = R.string.app_name),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Yellow,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                        Spacer(modifier = Modifier.weight(0.7f))
+                    }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color.hsl(329f, 0.72f, 0.31f),
+                    titleContentColor = Color.Yellow,
                 ),
                 actions = {
                     IconButton(onClick = {navController.navigate(Screen.About.route)}) {
-                        Icon(imageVector = Icons.Outlined.Info, contentDescription = stringResource(
-                            R.string.tentang_aplikasi
-                        ),
-                            tint = MaterialTheme.colorScheme.primary)
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = stringResource(R.string.tentang_aplikasi),
+                            tint = Color.Yellow
+                        )
                     }
                 }
             )
@@ -87,9 +109,11 @@ fun MainScreen(navController: NavHostController) {
     }
 }
 
+
 @SuppressLint("StringFormatMatches")
 @Composable
-fun  ScreenContent(modifier: Modifier) {
+fun ScreenContent(modifier: Modifier) {
+
     var berat by rememberSaveable {
         mutableStateOf("")
     }
@@ -127,6 +151,13 @@ fun  ScreenContent(modifier: Modifier) {
     var activityImageResource by rememberSaveable {
         mutableStateOf(R.mipmap.rebahan)
     }
+    var selectedActivityLevelWhenCalculate by rememberSaveable {
+        mutableStateOf(ActivityLevel.Jarang)
+    }
+    var genderWhenCalculate by rememberSaveable {
+        mutableStateOf("")
+    }
+
     val context = LocalContext.current
 
     Column (
@@ -137,9 +168,6 @@ fun  ScreenContent(modifier: Modifier) {
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = stringResource(id = R.string.bmr_intro),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = berat, onValueChange = {berat = it},
             label = { Text(text = stringResource(R.string.berat_badan))},
             isError = beratError,
@@ -164,11 +192,22 @@ fun  ScreenContent(modifier: Modifier) {
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        OutlinedTextField(value = umur, onValueChange = {umur = it},
-            label = { Text(text = stringResource(R.string.Umur))},
+        OutlinedTextField(
+            value = umur,
+            onValueChange = { umur = it },
+            label = { Text(text = stringResource(id = R.string.Umur)) },
             isError = umurError,
-            trailingIcon = { IconPicker(umurError, "tahun")},
-            supportingText = { ErrorHint(umurError)},
+            trailingIcon = {
+                Box(
+                    modifier = Modifier.padding(end = 8.dp)
+                ) {
+                    IconPicker(
+                        umurError,
+                        stringResource(id = R.string.tahun)
+                    )
+                }
+            },
+            supportingText = { ErrorHint(umurError) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -201,16 +240,19 @@ fun  ScreenContent(modifier: Modifier) {
             )
             if (bmrValue != 0f) {
                 bmr = bmrValue
+                selectedActivityLevelWhenCalculate = selectedActivityLevel // Perbarui level aktivitas yang dipilih
                 dailyCalories = hitungKaloriHarian(bmrValue, selectedActivityLevel)
                 activityImageResource = when (selectedActivityLevel) {
                     ActivityLevel.Jarang -> R.mipmap.rebahan
-                    ActivityLevel.Ringan -> R.mipmap.jalan
+                    ActivityLevel.Ringan -> R.mipmap.jalans
                     ActivityLevel.Cukup -> R.mipmap.bersepeda
                     ActivityLevel.Tinggi -> R.mipmap.angkatbeban
                 }
+                genderWhenCalculate = gender
             }
         },
             modifier = Modifier.padding(top = 8.dp),
+            colors = ButtonDefaults.buttonColors(Color.hsl(329f, 0.72f, 0.31f), contentColor = Color.Yellow),
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
         ) {
             Text(text = stringResource(R.string.hitung))
@@ -229,12 +271,6 @@ fun  ScreenContent(modifier: Modifier) {
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
-            val activityImageResource = when (selectedActivityLevel) {
-                ActivityLevel.Jarang -> R.mipmap.rebahan
-                ActivityLevel.Ringan -> R.mipmap.jalan
-                ActivityLevel.Cukup -> R.mipmap.bersepeda
-                ActivityLevel.Tinggi -> R.mipmap.angkatbeban
-            }
             Image(
                 painter = painterResource(id = activityImageResource),
                 contentDescription = null,
@@ -250,6 +286,7 @@ fun  ScreenContent(modifier: Modifier) {
                     umurError = false
                     gender = radioOptions[0]
                     bmr = 0f
+                    // Update selectedActivityLevel here
                     selectedActivityLevel = ActivityLevel.Jarang
                     dailyCalories = 0f
                 },
@@ -257,22 +294,20 @@ fun  ScreenContent(modifier: Modifier) {
             )
             Button(
                 onClick = {
-                    shareData(
-                        context = context,
-                        message = context.getString(
-                            R.string.bagikan_template,
-                            berat, tinggi, gender, umur
-                        )
-                    )
+                    val message = context.getString(R.string.bagikan_template,
+                        berat, tinggi, genderWhenCalculate, umur, selectedActivityLevel.name, bmr, dailyCalories)
+                    shareData(context, message, selectedActivityLevel, genderWhenCalculate)
                 },
                 modifier = Modifier.padding(top = 8.dp),
+                colors = ButtonDefaults.buttonColors(Color.hsl(329f, 0.72f, 0.31f), contentColor = Color.Yellow),
                 contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
             ) {
-                Text(text = stringResource(R.string.bagikan))
+                Text(text = stringResource(id = R.string.bagikan))
             }
         }
     }
 }
+
 @Composable
 fun ActivityLevelSelection(selectedLevel: ActivityLevel, onLevelSelected: (ActivityLevel) -> Unit) {
     Row(
@@ -295,6 +330,7 @@ fun ActivityLevelSelection(selectedLevel: ActivityLevel, onLevelSelected: (Activ
                         .padding(vertical = 8.dp)
                 ) {
                     RadioButton(
+                        colors = RadioButtonDefaults.colors(Color.hsl(329f, 0.72f, 0.31f)),
                         selected = selectedLevel == level,
                         onClick = null
                     )
@@ -326,20 +362,31 @@ fun ErrorHint(isError: Boolean) {
 
 @Composable
 fun GenderSwitch(isMaleSelected: Boolean, onGenderSelected: (Boolean) -> Unit) {
+    val context = LocalContext.current
+    val priaString = stringResource(id = R.string.pria)
+    val wanitaString = stringResource(id = R.string.wanita)
+
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = if (isMaleSelected) "Pria" else "Wanita",
+            text = if (isMaleSelected) priaString else wanitaString,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(end = 8.dp)
         )
         Switch(
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.hsl(329f, 0.72f, 0.31f),
+                checkedTrackColor = Color.hsl(277f, 0.68f, 0.12f),
+                uncheckedThumbColor = Color.hsl(329f, 0.72f, 0.31f),
+                uncheckedTrackColor = Color.hsl(32f, 0.75f, 0.92f)
+            ),
             checked = isMaleSelected,
             onCheckedChange = { onGenderSelected(it) }
         )
     }
 }
+
 
 @Composable
 fun ResetButton(
@@ -348,14 +395,14 @@ fun ResetButton(
 ) {
     Button(
         onClick = onReset,
-        modifier = modifier,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.hsl(329f, 0.72f, 0.31f)
+        ),
         contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
     ) {
-        Text(text = stringResource(R.string.reset))
+        Text(text = stringResource(R.string.reset), color = Color.Yellow)
     }
 }
-
-
 private fun hitungBMR(gender: Gender, berat: Float, tinggi: Float, umur: Int): Float {
     return when (gender) {
         Gender.MALE -> 66 + (13.7f * berat) + (5 * tinggi) - (6.8f * umur)
@@ -367,15 +414,31 @@ private fun hitungKaloriHarian(bmr: Float, activityLevel: ActivityLevel): Float 
     return bmr * activityLevel.value
 }
 
-private fun shareData (context: Context, message: String) {
+private fun shareData(context: Context, message: String, selectedActivityLevel: ActivityLevel, gender: String) {
+    val activityLevelStringResId = when (selectedActivityLevel) {
+        ActivityLevel.Jarang -> R.string.jarang
+        ActivityLevel.Ringan -> R.string.ringan
+        ActivityLevel.Cukup -> R.string.cukup
+        ActivityLevel.Tinggi -> R.string.tinggi
+    }
+    val activityLevelString = context.getString(activityLevelStringResId)
+    val genderStringResId = when (gender) {
+        context.getString(R.string.pria) -> R.string.pria
+        context.getString(R.string.wanita) -> R.string.wanita
+        else -> R.string.pria
+    }
+    val genderString = context.getString(genderStringResId)
+    val messageWithEnglishActivityLevel = message.replace(selectedActivityLevel.name, activityLevelString)
+        .replace(gender, genderString)
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, message)
+        putExtra(Intent.EXTRA_TEXT, messageWithEnglishActivityLevel)
     }
     if (shareIntent.resolveActivity(context.packageManager) != null) {
         context.startActivity(shareIntent)
     }
 }
+
 
 enum class ActivityLevel(val value: Float, @StringRes val stringResId: Int) {
     Jarang(1.2f, R.string.jarang),

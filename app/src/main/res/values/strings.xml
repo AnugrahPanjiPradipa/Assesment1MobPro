@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BMR Counter</string>
+    <string name="app_name">Penghitung BMR</string>
     <string name="bmr_intro">BMR, atau Basal Metabolic Rate merupakan kalori yang tubuh Anda perlukan untuk melakukan aktivitas dasar tubuh!</string>
     <string name="berat_badan">Berat badan</string>
     <string name="Tinggi_badan">Tinggi badan</string>
@@ -13,7 +13,6 @@
     <string name="copyright">Hitung BMR merupakan sebuah aplikasi Android untuk menghitung Basal Metabolic Rate (BMR) sehingga seseorang dapat mengetahui kalori yang tubuh Anda perlukan untuk melakukan aktivitas dasar tubuh.\n\nAplikasi ini dibuat untuk Assesment 1 kelas mobpro1.\n\nCopyright© 2021 - 2024 Anugrah Panji Pradipa.\n\nAll right reserved.</string>
     <string name="kembali">Kembali</string>
     <string name="bagikan">Bagikan</string>
-    <string name="bagikan_template">Berat badan: %1$s kg\nTinggi badan: %2$s cm\nJenis Kelamin: %3$s\nUmur: %4$s tahun</string>
     <string name="jarang">Jarang (sedikit atau tidak berolahraga)</string>
     <string name="ringan">Ringan (olahraga 1-3 hari/minggu)</string>
     <string name="cukup">Cukup (olahraga 3-5 hari/minggu)</string>
@@ -21,4 +20,8 @@
     <string name="kaloriharian">Kalori Harian Dibutuhkan: %1$d</string>
     <string name="activity_level">Level Aktivitas:</string>
     <string name="reset">Reset</string>
+    <string name="tahun">tahun</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="bagikan_template">Berat: %1$s kg\nTinggi: %2$s cm\nJenis Kelamin: %3$s\nUmur: %4$s\nJenis Aktivitas: %5$s\n\nBMR: %6$s\n Kalori Harian Dibutuhkan: %7$s</string>
 </resources>
