@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.text.style.BackgroundColorSpan
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,6 +63,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import org.d3if3061.assesment1.navigation.Screen
 import org.d3if3061.assesment1.ui.theme.Assesment1Theme
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +135,7 @@ fun ScreenContent(modifier: Modifier) {
         stringResource(id = R.string.wanita)
     )
     var gender by rememberSaveable {
-        mutableStateOf(radioOptions[0])
+        mutableStateOf("Pria")
     }
     var bmr by rememberSaveable {
         mutableStateOf(0f)
@@ -422,17 +420,30 @@ private fun shareData(context: Context, message: String, selectedActivityLevel: 
         ActivityLevel.Tinggi -> R.string.tinggi
     }
     val activityLevelString = context.getString(activityLevelStringResId)
-    val genderStringResId = when (gender) {
-        context.getString(R.string.pria) -> R.string.pria
-        context.getString(R.string.wanita) -> R.string.wanita
-        else -> R.string.pria
+
+    val genderStringResId = if (Locale.getDefault().language == "en") {
+        when (gender) {
+            "Pria" -> R.string.pria
+            "Wanita" -> R.string.wanita
+            else -> throw IllegalArgumentException("Unsupported gender string")
+        }
+    } else {
+        when (gender) {
+            "Pria" -> R.string.pria
+            "Wanita" -> R.string.wanita
+            else -> throw IllegalArgumentException("Unsupported gender string")
+        }
     }
     val genderString = context.getString(genderStringResId)
-    val messageWithEnglishActivityLevel = message.replace(selectedActivityLevel.name, activityLevelString)
-        .replace(gender, genderString)
+
+    val finalMessage = message
+        .replace(selectedActivityLevel.name, activityLevelString)
+        .replace("Pria", genderString)
+        .replace("Wanita", genderString)
+
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, messageWithEnglishActivityLevel)
+        putExtra(Intent.EXTRA_TEXT, finalMessage)
     }
     if (shareIntent.resolveActivity(context.packageManager) != null) {
         context.startActivity(shareIntent)

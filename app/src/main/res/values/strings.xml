@@ -10,7 +10,18 @@
     <string name="bmr_x">BMR: %1$.2f</string>
     <string name="input_invalid">tidak boleh kosong</string>
     <string name="tentang_aplikasi">Tentang Aplikasi</string>
-    <string name="copyright">Hitung BMR merupakan sebuah aplikasi Android untuk menghitung Basal Metabolic Rate (BMR) sehingga seseorang dapat mengetahui kalori yang tubuh Anda perlukan untuk melakukan aktivitas dasar tubuh.\n\nAplikasi ini dibuat untuk Assesment 1 kelas mobpro1.\n\nCopyright© 2021 - 2024 Anugrah Panji Pradipa.\n\nAll right reserved.</string>
+    <string name="copyright">Hitung BMR merupakan sebuah aplikasi Android untuk menghitung Basal Metabolic Rate (BMR) sehingga seseorang dapat mengetahui kalori yang tubuh Anda perlukan untuk melakukan aktivitas dasar tubuh.
+        \n\nCara menghitung BMR adalah sebagai berikut:
+        \n\BMR Pria = 66,5 + (13,7 × berat badan) + (5 × tinggi badan) – (6,8 × usia)
+        \n\BMR Wanita = 655 + (9,6 × berat badan) + (1,8 × tinggi badan) – (4,7 × usia)
+        \n\nLalu hasil dikalikan dengan tingkan aktivitas yang dilakukan:
+        \n\Jarang x 1.2
+        \n\Ringan x 1.375
+        \n\Cukup x 1.55
+        \n\Tinggi x 1.9
+        \n\nAplikasi ini dibuat untuk Assesment 1 kelas mobpro1.
+        \n\nCopyright© 2021 - 2024 Anugrah Panji Pradipa.
+        \n\nAll right reserved.</string>
     <string name="kembali">Kembali</string>
     <string name="bagikan">Bagikan</string>
     <string name="jarang">Jarang (sedikit atau tidak berolahraga)</string>

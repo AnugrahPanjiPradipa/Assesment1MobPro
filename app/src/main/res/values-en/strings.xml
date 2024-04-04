@@ -11,7 +11,18 @@
     <string name="bmr_x">BMR: %1$.2f</string>
     <string name="input_invalid">Cannot empty</string>
     <string name="tentang_aplikasi">About Application</string>
-    <string name="copyright">Calculate BMR is an Android application for calculating Basal Metabolic Rate (BMR) so that one can find out the calories your body needs to carry out basic body activities.  This application was created for Assessment 1 class mobpro1.  Copyright© 2021 - 2024 Anugrah Panji Pradipa.  All rights reserved.</string>
+    <string name="copyright">Calculate BMR is an Android application for calculating Basal Metabolic Rate (BMR) so that one can find out the calories your body needs to carry out basic body activities.
+        \n\nThe way to calculate BMR is as follows:
+        \n\Male BMR = 66.5 + (13.7 × body weight) + (5 × height) – (6.8 × age)
+        \nFemale BMR = 655 + (9.6 × body weight) + (1.8 × height) – (4.7 × age)
+        \n\nThen the results are multiplied by the level of activity carried out:
+        \n\Rarely x 1.2
+        \n\Light x 1,375
+        \n\Moderate x 1.55
+        \n\Height x 1.9         T
+        \n\nThis application was created for Assessment 1 class mobpro1.
+        \n\nCopyright© 2021 - 2024 Anugrah Panji Pradipa.
+        \n\nAll rights reserved.</string>
     <string name="kembali">Back</string>
     <string name="bagikan">Share</string>
     <string name="jarang">Rarely (little or no exercise)</string>
